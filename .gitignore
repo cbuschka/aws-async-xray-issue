@@ -1,0 +1,7 @@
+/venv/
+/target/
+.idea/
+terraform.tfstate
+.terraform/
+terraform.tfstate*
+/log
