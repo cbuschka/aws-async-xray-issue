@@ -3,7 +3,7 @@ import logging
 
 import aioboto3
 from aws_xray_sdk.core import xray_recorder, patch_all
-from aws_xray_sdk.core.async_context import AsyncContext
+from my_lambda.new_async_context import AsyncContext
 from my_lambda.output_bucket import write_some_output
 
 xray_recorder.configure(

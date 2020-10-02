@@ -68,10 +68,10 @@ clean:
 	find . -name 'terraform.tfstate*' -print | grep devel | xargs -I FILE rm 'FILE'
 
 invoke_single:
-	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type Event --payload '{"op":"single"}' log
+	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type RequestResponse --payload '{"op":"single"}' log
 
 invoke_serial:
-	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type Event --payload '{"op":"serial"}' log
+	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type RequestResponse --payload '{"op":"serial"}' log
 
 invoke_parallel:
-	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type Event --payload '{"op":"parallel"}' log
+	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type RequestResponse --payload '{"op":"parallel"}' log
