@@ -75,3 +75,6 @@ invoke_serial:
 
 invoke_parallel:
 	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type RequestResponse --payload '{"op":"parallel"}' log
+
+invoke_fanout:
+	aws lambda invoke --function-name "${SCOPE}-lambda" --log-type Tail --invocation-type RequestResponse --payload '{"op":"fanout"}' log

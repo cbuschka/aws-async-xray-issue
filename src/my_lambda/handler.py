@@ -3,8 +3,9 @@ import logging
 
 import aioboto3
 from aws_xray_sdk.core import xray_recorder, patch_all
+
 from my_lambda.new_async_context import AsyncContext
-from my_lambda.output_bucket import write_some_output
+from my_lambda.output_bucket import write_some_output, write_some_output_in_parallel
 
 xray_recorder.configure(
     sampling=False,
@@ -33,7 +34,9 @@ async def handle_event_async(event):
     if event["op"] == "serial":
         await serially_works()
     if event["op"] == "parallel":
-        await parallel_fails()
+        await parallel_works()
+    if event["op"] == "fanout":
+        await fanout_works()
 
 
 async def single_works():
@@ -49,7 +52,13 @@ async def serially_works():
                 await write_some_output(s3_resource)
 
 
-async def parallel_fails():
+async def parallel_works():
     async with xray_recorder.in_segment_async(name='parallel'):
         async with aioboto3.resource("s3") as s3_resource:
             await asyncio.gather(*[write_some_output(s3_resource) for _ in range(0, 10)])
+
+
+async def fanout_works():
+    async with xray_recorder.in_segment_async(name='fanout'):
+        async with aioboto3.resource("s3") as s3_resource:
+            await asyncio.gather(*[write_some_output_in_parallel(s3_resource) for _ in range(0, 4)])
