@@ -112,25 +112,13 @@ class TaskFactory(object):
         self.orig_task_factory = orig_task_factory
 
     def __call__(self, loop, coro, *args, **kwargs):
-        async def wrapper():
-            current_task = _get_current_task(loop=loop)
-            # _notify_listeners(_start_listeners, current_task)
-            try:
-                result = await coro
-                return result
-            finally:
-                pass
-                # _notify_listeners(_finish_listeners, current_task)
+        if self.orig_task_factory:
+            task = self.orig_task_factory(loop, coro, *args, **kwargs)
+        else:
+            task = asyncio.tasks.Task(coro, *args, loop=loop, **kwargs)
 
         parent_task = _get_current_task(loop=loop)
-
-        if self.orig_task_factory:
-            task = self.orig_task_factory(loop, wrapper, *args, **kwargs)
-        else:
-            task = asyncio.tasks.Task(wrapper(), *args, loop=loop, **kwargs)
-        # _notify_listeners(_create_listeners, task, parent_task=parent_task)
         if parent_task is not None and hasattr(parent_task, 'context'):
-            parent_context = parent_task.context
             new_context = {"entities": [self.context.get_trace_entity()]}
             setattr(task, 'context', new_context)
 
